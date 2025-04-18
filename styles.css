@@ -1,0 +1,183 @@
+body {
+    font-family: 'Roboto Mono', monospace;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #e0e0e0;
+}
+
+header {
+    background: linear-gradient(90deg, #0f3460, #16213e);
+    color: #00d4ff;
+    text-align: center;
+    padding: 20px 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    border-bottom: 3px solid #00d4ff;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff;
+}
+
+header p {
+    margin: 5px 0 0;
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: #a6e3ff;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#controls {
+    margin-bottom: 20px;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+#file-input, #load-sample, #view-level, #search-box {
+    padding: 12px 20px;
+    font-size: 14px;
+    border: 1px solid #00d4ff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    background: linear-gradient(90deg, #16213e, #1a1a2e);
+    color: #00d4ff;
+    text-shadow: 0 0 5px #00d4ff;
+}
+
+#file-input:hover, #load-sample:hover, #view-level:hover, #search-box:focus {
+    background: linear-gradient(90deg, #1a1a2e, #16213e);
+    box-shadow: 0 4px 8px rgba(0, 212, 255, 0.5);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+#file-input::-webkit-file-upload-button {
+    display: none;
+}
+
+#search-box::placeholder {
+    color: #a6e3ff;
+    opacity: 0.7;
+}
+
+#graph-container {
+    width: 100%;
+    max-width: 1200px;
+    height: 70vh;
+    border: 1px solid #00d4ff;
+    background: linear-gradient(135deg, #0f3460, #1a1a2e);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+footer {
+    background: linear-gradient(90deg, #0f3460, #16213e);
+    color: #00d4ff;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 0.9rem;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.links line {
+    stroke: #00d4ff;
+    stroke-width: 2;
+    transition: stroke 0.3s ease;
+    marker-end: url(#arrowhead);
+}
+
+.links line:hover {
+    stroke: #00ffab;
+}
+
+.nodes circle {
+    transition: fill 0.3s ease, stroke 0.3s ease, transform 0.2s ease;
+    fill: #00d4ff;
+    stroke: #00ffab;
+}
+
+.nodes circle:hover {
+    fill: #00ffab;
+    stroke: #00d4ff;
+}
+
+.nodes circle.root {
+    fill: #ff5722; /* Highlight color for root nodes */
+    stroke: #ff8a50;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+}
+
+.nodes circle.root:hover {
+    fill: #ff8a50;
+    stroke: #ff5722;
+}
+
+.labels text {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    fill: #e0e0e0;
+    pointer-events: none;
+}
+
+.tooltip {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    color: #e0e0e0;
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    border: 1px solid #00d4ff;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    position: absolute;
+    display: none;
+    z-index: 10;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#file-name-display {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: 'Roboto Mono', monospace;
+    color: #00d4ff;
+    text-shadow: 0 0 5px #00d4ff, 0 0 10px #00d4ff;
+    border-left: 1px solid #00d4ff;
+    border-bottom: 1px solid #00d4ff;
+    backdrop-filter: blur(5px);
+    padding: 12px 20px;
+    border-radius: 0 0 0 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    pointer-events: none;
+}

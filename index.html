@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tangle Map</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Tangle Map</h1>
+        <p>Visualize your Webpack stats like never before</p>
+    </header>
+    <main>
+        <div id="controls">
+            <input type="file" id="file-input" accept=".json">
+            <button id="load-sample">Load Sample</button>
+            <select id="view-level">
+                <option value="module">Module Level</option>
+                <option value="chunk">Chunk Level</option>
+            </select>
+            <input type="text" id="search-box" placeholder="Fuzzy search nodes...">
+        </div>
+        <div id="graph-container"></div>
+    </main>
+    <footer>
+        <p>Powered by skywalker_z &amp; GPT-4o, built with D3.js</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

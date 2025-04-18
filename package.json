@@ -1,0 +1,16 @@
+{
+  "name": "tangle-map",
+  "version": "0.1.0",
+  "description": "Visualize your Webpack stats like never before!",
+  "scripts": {
+    "start": "npx http-server -c-1 -p 8080",
+    "deploy": "gh-pages -d ."
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "homepage": "https://rexskz.github.io/tangle-map",
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.8.1+sha256.d8b2ebbc65cf02c349eca6b45c9640b910f16b6adebdb7b926e9db440e47cac7"
+}
