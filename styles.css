@@ -127,6 +127,12 @@ footer {
     transition: fill 0.3s ease, stroke 0.3s ease;
 }
 
+.nodes circle.inferred {
+    fill: grey;
+    stroke: darkgrey;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+}
+
 .nodes circle.root:hover {
     fill: #ff8a50;
     stroke: #ff5722;
@@ -140,6 +146,8 @@ footer {
 }
 
 .tooltip {
+    max-width: 360px;
+    box-sizing: border-box;
     font-family: 'Roboto Mono', monospace;
     font-size: 14px;
     color: #e0e0e0;
@@ -150,8 +158,16 @@ footer {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     position: absolute;
     display: none;
+    flex-direction: column;
+    gap: 4px;
     z-index: 10;
     animation: fadeIn 0.3s ease;
+}
+
+.tooltip p {
+    margin: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 @keyframes fadeIn {

@@ -52,36 +52,45 @@ function parseStatsModuleLevel(stats) {
         ...extractModules(stats.modules || []),
         ...extractModules(stats.children?.flatMap(child => child.modules || []) || [])
     ];
+    const nodeMap = new Map();
+    for (const node of nodes) {
+        nodeMap.set(node.name, node);
+    }
 
     const edges = [];
     const uniqueEdgesMap = new Map();
+    function pushEdge(edges, source, target) {
+        edges.push({ source, target });
+        if (!nodeMap.has(source)) {
+            const inferredNode = { id: source, name: source, type: 'inferred' };
+            nodes.push(inferredNode);
+            nodeMap.set(source, inferredNode);
+        }
+        if (!nodeMap.has(target)) {
+            const inferredNode = { id: source, name: target, type: 'inferred' };
+            nodes.push(inferredNode);
+            nodeMap.set(target, inferredNode);
+        }
+    }
+
     const addEdgesFromReasons = (modules) => {
         for (const module of modules) {
             if (module.reasons) {
                 for (const reason of module.reasons) {
                     if (reason.moduleId !== undefined && reason.moduleId !== null) {
-                        // Avoid duplicate edges
                         const edgeKey = `${reason.moduleName}-${module.name || module.identifier}`;
                         if (!uniqueEdgesMap.has(edgeKey)) {
                             uniqueEdgesMap.set(edgeKey, true);
-                            edges.push({
-                                source: reason.moduleName || reason.moduleId,
-                                target: module.name || module.identifier
-                            });
+                            pushEdge(edges, reason.moduleName || reason.moduleId, module.name || module.identifier);
                         }
                     }
                 }
             }
-            if (module.issuerId !== undefined && module.issuerId !== null) {
-                // Avoid duplicate edges
+            if (module.issuerName !== undefined && module.issuerName !== null) {
                 const edgeKey = `${module.issuerName}-${module.name || module.identifier}`;
                 if (!uniqueEdgesMap.has(edgeKey)) {
                     uniqueEdgesMap.set(edgeKey, true);
-                    // Add edges for issuer to module
-                    edges.push({
-                        source: module.issuerName || module.issuerId,
-                        target: module.name || module.identifier
-                    });
+                    pushEdge(edges, module.issuerName || module.issuerId, module.name || module.identifier);
                 }
             }
         }
@@ -115,35 +124,45 @@ function parseStatsChunkLevel(stats) {
         ...extractChunks(stats.chunks || []),
         ...extractChunks(stats.children?.flatMap(child => child.chunks || []) || [])
     ];
+    const nodeMap = new Map();
+    for (const node of nodes) {
+        nodeMap.set(node.name, node);
+    }
 
     const edges = [];
     const uniqueEdgesMap = new Map();
+    function pushEdge(edges, source, target) {
+        edges.push({ source, target });
+        if (!nodeMap.has(source)) {
+            const inferredNode = { id: source, name: source, type: 'inferred' };
+            nodes.push(inferredNode);
+            nodeMap.set(source, inferredNode);
+        }
+        if (!nodeMap.has(target)) {
+            const inferredNode = { id: source, name: target, type: 'inferred' };
+            nodes.push(inferredNode);
+            nodeMap.set(target, inferredNode);
+        }
+    }
+
     if (stats.chunks) {
         for (const chunk of stats.chunks) {
             // Add edges for chunk dependencies
             if (chunk.parents) {
                 for (const parentId of chunk.parents) {
-                    // Avoid duplicate edges
                     const edgeKey = `${parentId.name || parentId.identifier}-${chunk.name || chunk.identifier}`;
                     if (!uniqueEdgesMap.has(edgeKey)) {
                         uniqueEdgesMap.set(edgeKey, true);
-                        edges.push({
-                            source: parentId.name || parentId.identifier,
-                            target: chunk.name || chunk.identifier
-                        });
+                        pushEdge(edges, parentId.name || parentId.identifier, chunk.name || chunk.identifier);
                     }
                 }
             }
             if (chunk.children) {
                 for (const childId of chunk.children) {
-                    // Avoid duplicate edges
                     const edgeKey = `${chunk.name || chunk.identifier}-${childId.name || childId.identifier}`;
                     if (!uniqueEdgesMap.has(edgeKey)) {
                         uniqueEdgesMap.set(edgeKey, true);
-                        edges.push({
-                            source: chunk.name || chunk.identifier,
-                            target: childId.name || childId.identifier
-                        });
+                        pushEdge(edges, chunk.name || chunk.identifier, childId.name || childId.identifier);
                     }
                 }
             }
@@ -151,14 +170,10 @@ function parseStatsChunkLevel(stats) {
             // Add edges for chunk-to-module relationships
             if (chunk.modules) {
                 for (const module of chunk.modules) {
-                    // Avoid duplicate edges
                     const edgeKey = `${chunk.name || chunk.identifier}-${module.name || module.identifier}`;
                     if (!uniqueEdgesMap.has(edgeKey)) {
                         uniqueEdgesMap.set(edgeKey, true);
-                        edges.push({
-                            source: chunk.name || chunk.identifier,
-                            target: module.name || module.identifier
-                        });
+                        pushEdge(edges, chunk.name || chunk.identifier, module.name || module.identifier);
                     }
                 }
             }
@@ -172,28 +187,19 @@ function parseStatsChunkLevel(stats) {
                     // Add edges for child chunk dependencies
                     if (chunk.parents) {
                         for (const parentId of chunk.parents) {
-                            edges.push({
-                                source: parentId.name || parentId.identifier,
-                                target: chunk.name || chunk.identifier
-                            });
+                            pushEdge(edges, parentId.name || parentId.identifier, chunk.name || chunk.identifier);
                         }
                     }
                     if (chunk.children) {
                         for (const childId of chunk.children) {
-                            edges.push({
-                                source: chunk.name || chunk.identifier,
-                                target: childId.name || childId.identifier
-                            });
+                            pushEdge(edges, chunk.name || chunk.identifier, childId.name || childId.identifier);
                         }
                     }
 
                     // Add edges for child chunk-to-module relationships
                     if (chunk.modules) {
                         for (const module of chunk.modules) {
-                            edges.push({
-                                source: chunk.name || chunk.identifier,
-                                target: module.name || module.identifier
-                            });
+                            pushEdge(edges, chunk.name || chunk.identifier, module.name || module.identifier);
                         }
                     }
                 }
@@ -293,15 +299,16 @@ function renderGraph({ nodes, edges }) {
         .attr('stroke', '#333')
         .attr('stroke-width', 2)
         .classed('root', d => d.depth === 0) // Add 'root' class for nodes with depth === 0
+        .classed('inferred', d => d.type === 'inferred') // Add 'inferred' class for inferred nodes
         .style('filter', 'drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.2))')
         .on('mouseover', (event, d) => {
-            tooltip.style('display', 'block')
+            tooltip.style('display', 'flex')
                 .html([
-                    `<strong>Name:</strong> ${d.name ?? 'N/A'}<br>`,
-                    `<strong>Size:</strong> ${d.size ?? 'N/A'} bytes<br>`,
-                    typeof d.depth !== 'undefined' && `<strong>Depth:</strong> ${d.depth ?? 'N/A'}<br>`,
-                    Array.isArray(d.providedExports) && d.providedExports.length > 0 && `<strong>Provided exports:</strong> ${d.providedExports.join(', ') ?? 'N/A'}<br>`,
-                    Array.isArray(d.files) && d.files.length > 0 && `<strong>Files:</strong> ${d.files.join(', ') ?? 'N/A'}<br>`,
+                    `<p><strong>Name:</strong> ${d.type === 'inferred' ? '(inferred) ' : ''}${d.name ?? 'N/A'}</p>`,
+                    `<p><strong>Size:</strong> ${d.size ?? 'N/A'} bytes</p>`,
+                    typeof d.depth !== 'undefined' && `<p><strong>Depth:</strong> ${d.depth ?? 'N/A'}</p>`,
+                    Array.isArray(d.providedExports) && d.providedExports.length > 0 && `<p><strong>Provided exports:</strong> ${d.providedExports.join(', ') ?? 'N/A'}</p>`,
+                    Array.isArray(d.files) && d.files.length > 0 && `<p><strong>Files:</strong> ${d.files.join(', ') ?? 'N/A'}</p>`,
                 ].filter(Boolean).join(''));
         })
         .on('mousemove', (event) => {
@@ -490,17 +497,20 @@ document.getElementById('search-box').addEventListener('keydown', (event) => {
         const svg = d3.select('svg');
         const nodes = svg.selectAll('.nodes circle');
         const links = svg.selectAll('.links line');
+        const labels = svg.selectAll('.labels text');
 
         if (query.trim() === '') {
             // Reset all nodes and edges
             nodes.style('opacity', 1);
             links.style('opacity', 1);
+            labels.style('opacity', 1);
         } else {
             // Perform fuzzy search
             nodes.style('opacity', d => (d.name.toLowerCase().includes(query) ? 1 : 0.3));
             links.style('opacity', d => (
                 d.source.name.toLowerCase().includes(query) || d.target.name.toLowerCase().includes(query) ? 1 : 0.3
             ));
+            labels.style('opacity', d => (d.name.toLowerCase().includes(query) ? 1 : 0.3));
         }
     }
 });
